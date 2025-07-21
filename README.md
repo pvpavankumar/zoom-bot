@@ -151,23 +151,6 @@ The bot automatically validates all systems on startup:
 - **Zoom account with API access**
 - **OpenAI API key**
 
-## 🆘 Troubleshooting
-
-### Common Issues
-
-**❌ "Access token expired"**
-```bash
-python fix_auth_comprehensive.py
-```
-
-**❌ Audio not working**
-- Check microphone permissions
-- Run: `python -c "import sounddevice; print(sounddevice.query_devices())"`
-
-**❌ Bot not starting**
-- Check logs: `type logs\zoom_bot.log`
-- Validate setup: `python tests\startup_validator.py`
-
 ### Support
 - Check logs in `logs/zoom_bot.log`
 - Run validation: `python tests\startup_validator.py`

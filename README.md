@@ -143,7 +143,7 @@ The bot automatically validates all systems on startup:
 | **Platform** | Zoom SDK | Meeting integration |
 | **Validation** | Custom testing | Startup health checks |
 
-## � System Requirements
+## System Requirements
 
 - **Python 3.8+**
 - **Microphone access**

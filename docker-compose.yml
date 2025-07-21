@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  # Redis for Celery broker and caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+  # PostgreSQL for persistent storage (optional)
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: zoom_bot_db
+      POSTGRES_USER: zoom_bot
+      POSTGRES_PASSWORD: secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  # Main application
+  zoom-bot:
+    build: .
+    ports:
+      - "8000:8000"
+      - "8765:8765"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DATABASE_URL=postgresql+asyncpg://zoom_bot:secure_password@postgres:5432/zoom_bot_db
+    volumes:
+      - ./logs:/app/logs
+      - ./temp:/app/temp
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  # Celery worker for distributed tasks
+  celery-worker:
+    build: .
+    command: celery -A src.tasks.celery_app worker --loglevel=info --concurrency=4
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DATABASE_URL=postgresql+asyncpg://zoom_bot:secure_password@postgres:5432/zoom_bot_db
+    volumes:
+      - ./logs:/app/logs
+      - ./temp:/app/temp
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  # Celery beat for periodic tasks
+  celery-beat:
+    build: .
+    command: celery -A src.tasks.celery_app beat --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  # Flower for Celery monitoring (optional)
+  flower:
+    build: .
+    command: celery -A src.tasks.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # Nginx reverse proxy (optional)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/ssl:ro
+    depends_on:
+      - zoom-bot
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+  postgres_data:

@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Zoom Interview Bot",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"-m",
+				"src.main"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}

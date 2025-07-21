@@ -1,0 +1,55 @@
+# Zoom Interview Bot - Core Requirements
+# Optimized dependency list for production use
+
+# ===== WEB FRAMEWORK =====
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+websockets==12.0
+
+# ===== DATA VALIDATION =====
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# ===== DISTRIBUTED PROCESSING =====
+celery[redis]==5.3.4
+redis>=4.5.2,<5.0.0
+
+# ===== AI AND ANALYSIS =====
+openai==1.3.5
+numpy>=1.21.0,<2.0.0
+
+# ===== MODERN AUDIO STACK (NO PYAUDIO) =====
+SpeechRecognition==3.10.0
+pydub==0.25.1
+sounddevice==0.4.6
+soundfile==0.12.1
+librosa==0.10.1
+webrtcvad==2.0.10
+ffmpeg-python==0.2.0
+
+# ===== ZOOM INTEGRATION =====
+zoomus==1.2.1
+
+# ===== DATABASE =====
+sqlalchemy==2.0.36
+asyncpg==0.29.0
+
+# ===== UTILITIES =====
+loguru==0.7.2
+python-dotenv==1.0.0
+python-multipart==0.0.6
+httpx==0.25.2
+aiofiles==23.2.1
+python-dateutil==2.8.2
+
+# ===== SECURITY =====
+cryptography>=41.0.0
+PyJWT==2.8.0
+
+# ===== BUILD TOOLS =====
+setuptools>=61.0
+
+# ===== TESTING =====
+pytest==7.4.3
+pytest-asyncio==0.21.1
+wheel
